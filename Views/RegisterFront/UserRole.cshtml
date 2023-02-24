@@ -1,0 +1,259 @@
+﻿
+@{
+    ViewData["Title"] = "UserRole";
+}
+
+@{
+    Layout = "~/Views/Shared/theme.cshtml";
+}
+<link rel="stylesheet" href="/css/Style.css">
+<!-- jQuery -->
+<script src="/theme/plugins/jquery/jquery.min.js"></script>
+
+  <button type="submit" id="main" class="btn btn-success float-right mx-3">Main</button>
+  <button type="submit" id="permission" class="btn btn-success float-right mx-3">permission</button>
+  <button type="submit" id="roleAssignment" class="btn btn-success float-right mx-3">Role Assignment</button>
+
+
+  
+                               <!--Update Data-->
+    <table id="tblUpdate">
+        <tr>
+            <td id="upd-heading">Update Data</td>
+        </tr>
+       <tr>
+        <td>
+            <label for="RoleId"> Id:</label>
+            <input name="txtUserRoleId" readonly type="text" id="txtUserRoleId">
+        </td>
+       </tr>
+       <tr>
+        <td>
+            <label for="departmentName">User Role:</label>
+            <input name="txtUserRole" type="text" id="txtUserRole" >
+        </td>
+       </tr>
+       <tr>
+        <td>
+            <button  id="btnUpdate" name="btnUpdate">Update</button>
+            <button  id="btnCancel" name="btnCancel">Cancel</button>
+        </td>
+       </tr>
+    </table>
+    <!--end of Update Data-->
+
+    <!--Insert Data-->
+ <table id="tblInsert">
+        <tr>
+            <td id="insert-heading">Insert User Data</td>
+        </tr>
+       <tr>
+        <td>
+            <label for="txtUserTitle">Title:</label>
+            <input name="txtUserTitle" type="text" id="txtUserTitle">
+        </td>
+       </tr>
+       <tr>
+        <td>
+            <button  type="submit" id="btnSubmit">Insert</button>
+        </td>
+       </tr>
+    </table>
+<!-- end of insert data-->
+
+
+
+                               <!--All Data-->
+    <table id="allData">
+    <thead>
+        <tr>
+    <th>Id</th>
+    <th>Name</th>
+    <th>Action</th>
+  </tr>
+    </thead>
+    <tbody id="tblData"></tbody>
+</table>
+
+
+<script>
+var srN = 0;
+    $(document).ready(function() {
+    
+        $("#main").click(function() {
+            window.location.href = "/RegisterFront/CMS";
+        })
+
+        $("#permission").click(function() {
+            window.location.href = "/RegisterFront/Permission";
+        })
+
+        $("#roleAssignment").click(function() {
+            window.location.href = "/RegisterFront/RoleAssignment";
+        })
+
+    //get
+    $.ajax({
+        url: '/api/UserRole/GetAllUser',
+        type: 'GET',
+        dataType: "json",
+         headers: {
+                "Authorization": "Bearer " + myToken
+            },
+        success: function(data) {
+            var trData = "";
+            $.each(data, function(index, obj) {
+                srN+=1;
+                trData += "<tr><td class='tdSrNo'>" + srN + "</td><td id='userroletitle"+ obj.userId +"'>" + obj.userTitle + "</td><td> <button  class='btn  btn-danger btnDelete' id='btnDelete" + obj.userId + "'>Delete</button> <button  class='btn  btn-warning btnEdit' id='btnEdit" + obj.userId + "'>Edit</button> </td></tr>"
+                $('#tblData').html(trData);
+            })
+        }
+    });
+    // end of get request
+
+     //post
+    $('#btnSubmit').click(function() {
+        var userTitle = $('#txtUserTitle').val();
+        var obj = { "userTitle": userTitle};
+        $.ajax({
+            url: '/api/UserRole/InsertUserRole',
+            type: "POST",
+            'contentType': 'application/json',
+            dataType: "json",
+            data: JSON.stringify(obj),
+            headers: {
+                "Authorization": "Bearer " + myToken
+            },
+            success: function(data) {
+                
+                if (data.result == "Inserted Successfully") {
+                    //alert(myToken);
+                    srN += 1;
+
+                    $('#tblData').append("<tr><td class='tdSrNo'>" + srN + "</td><td id='userroletitle"+ data.objectData.userId +"'>" + data.objectData.userTitle + "</td><td> <button  class='btn  btn-danger btnDelete' id='btnDelete" + data.objectData.userId + "'>Delete</button> <button  class='btn  btn-warning btnEdit' id='btnEdit" + data.objectData.userId + "'>Edit</button> </td></tr>")
+                    $('.tdSrNo').each(function (index,obj) {
+                            $(this).html(index+1);
+                        });
+                    $('#txtUserTitle').val('');
+        
+                }
+                else {
+                    alert(data.result);
+                }
+            }
+        });
+    })
+
+    //End of POST Request
+
+    //update
+    $('#tblUpdate').hide();
+
+    $('#btnCancel').click(function() {
+        $('#tblUpdate').hide();
+        $('#tblInsert').show();
+    })
+
+    $('#btnUpdate').click(function() {
+        var id = $('#txtUserRoleId').val();
+        var name = $('#txtUserRole').val();
+
+        var obj = {'userId':id,'userTitle':name}
+        
+        $.ajax({
+            url: '/api/UserRole/UpdateUserRole',
+            type: "PUT",
+            'contentType': 'application/json',
+            dataType: "json",
+            headers: {
+                "Authorization": "Bearer " + myToken
+            },
+            data: JSON.stringify(obj),
+            success: function(data) {
+                
+                if (data.result == "Updated Successfully") {
+                    var id = $('#txtUserRoleId').val();
+                    var userTitle = $('#txtUserRole').val();
+                    //alert(data.result);
+
+                    $('#userroletitle' + id).html(userTitle);
+
+
+                    $('#txtUserRoleId').val('');
+                    $('#txtUserRole').focus();
+                    $('#txtUserRole').val('');
+        
+                }
+                else {
+                    alert(data.result);
+                }
+            }
+        });
+        
+        $('#tblInsert').show();
+        $('#tblUpdate').hide();
+        
+    });
+    
+    $(document).on('click', '.btnEdit', function() {
+        
+        $('html, body').animate({
+                    scrollTop: $("#tblUpdate").offset().top
+               }, 800);
+
+        var userRoleId = $(this).attr('id');
+        userRoleId = userRoleId.replace('btnEdit', '');
+        var userRoleTitle = $('#userroletitle' + userRoleId).html();
+
+        $('#tblUpdate').show();
+        $('#tblInsert').hide();
+
+        $('#txtUserRoleId').val(userRoleId);
+        $('#txtUserRole').val(userRoleTitle);
+
+    });
+    //End of PUT Request
+
+
+    // Delete Request
+       $(document).on('click', '.btnDelete', function() {
+        var userRoleId = $(this).attr('id');
+        userRoleId = userRoleId.replace('btnDelete', '');
+         
+        if (confirm("You want to delete this"))
+        {
+           var obj = { 'userId': userRoleId }
+            $.ajax({
+                url: '/api/UserRole/DeleteUserRole',
+                type: "DELETE",
+                headers: {
+                "Authorization": "Bearer " + myToken
+            },
+                'contentType': 'application/json',
+                dataType: "json",
+                data: JSON.stringify(obj),
+                success: function(response) 
+                {
+                    if (response.result =="Deleted Successfully") 
+                    {
+                        $('#btnDelete' + response.objectData.id).closest('tr').remove();
+                        $('.tdSrNo').each(function (index,obj) {
+                            $(this).html(index+1);
+                        });
+                        alert("Department Deleted Successfully");
+                    }
+                    else 
+                    {
+                        alert(response.result);
+                    }
+                }
+            });
+        }
+    });
+//End of delete request
+
+
+    })
+
+</script>
+

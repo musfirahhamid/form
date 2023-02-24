@@ -1,0 +1,365 @@
+﻿
+@{
+    ViewData["Title"] = "RoleAssignment";
+}
+@{
+    Layout = "~/Views/Shared/theme.cshtml";
+}
+
+<link rel="stylesheet" href="/css/Style.css">
+<!-- jQuery -->
+<script src="/theme/plugins/jquery/jquery.min.js"></script>
+
+
+  <button type="submit" id="main" class="btn btn-success float-right mx-3">Main</button>
+  <button type="submit" id="permission" class="btn btn-success float-right mx-3">permission</button>
+  <button type="submit" id="userRole" class="btn btn-success float-right mx-3">User Role</button>
+
+                               <!--Update Data-->
+    <table id="tblUpdate">
+        <tr>
+            <td id="upd-heading">Update Data</td>
+        </tr>
+        <tr>
+        <td>
+            <label for="permissionName">Permission Title:</label> <br />
+            <select id="lstpermissionNameUpdate"></select>
+        </td>
+       </tr>
+      @* <tr>
+        <td>
+            <label for="permissionName">Permission URL:</label> <br />
+            <select id="lstpermissionUrlUpdate"></select>
+        </td>
+       </tr>*@
+       <tr>
+        <td>
+            <label for="userRoleName">User Role:</label> <br />
+            <select id="lstuserRoleNameUpdate"></select>
+        </td>
+       </tr>
+       <tr>
+        <td>
+            <button  id="btnUpdate" name="btnUpdate">Update</button>
+            <button  id="btnCancel" name="btnCancel">Cancel</button>
+        </td>
+       </tr>
+    </table>
+
+  <!--End of Update Data-->
+
+<!--Insert Table-->
+<table id="tblInsert">
+        <tr>
+            <td id="insert-heading">Role Assignment</td>
+        </tr>
+        <tr>
+        <td>
+            <label for="permissionName">Permission Title:</label> <br />
+            <select id="lstpermissionName"></select>
+        </td>
+       </tr>
+      @* <tr>
+        <td>
+            <label for="permissionName">Permission URL:</label> <br />
+            <select id="lstpermissionUrl"></select>
+        </td>
+       </tr>*@
+       <tr>
+        <td>
+            <label for="userRoleName">User Role:</label> <br />
+            <select id="lstuserRoleName"></select>
+        </td>
+       </tr>
+       <tr>
+        <td>
+            <button  type="submit" id="btnSubmit">Insert</button>
+        </td>
+       </tr>
+    </table>
+    <!--Insert Table-->
+
+   
+                              <!--All Data-->
+    <table id="allData">
+    <thead>
+        <tr>
+    <th>Sr.No.</th>
+    <th>Permission Id</th>
+    <th>Permission Name</th>
+    <th>Permission URL</th>
+    <th>User Id</th>
+    <th>User Role</th>
+	 <th>Action</th>
+  </tr>
+    </thead>
+    <tbody id="tblData"></tbody>
+</table>
+ <!-- end of All Data-->
+
+
+    <script>
+$(document).ready(function() { 
+    var srN=0;
+    var updAssignmentId = 0;
+    GetRoleAssignmentData();
+
+    //var myToken  =  getCookie("MyToken");
+     $("#main").click(function() {
+            window.location.href = "/RegisterFront/CMS";
+        })
+        $("#permission").click(function() {
+            window.location.href = "/RegisterFront/Permission";
+        })
+        $("#userRole").click(function() {
+            window.location.href = "/RegisterFront/UserRole";
+        })
+
+        //get permission title list
+        $.ajax({
+        url: '/api/Permissions/GetAllData',
+        type: 'GET',
+        dataType: "json",
+         headers: {
+                "Authorization": "Bearer " + myToken
+            },
+        success: function(data) {
+            var trData = "";
+            $.each(data, function(index, obj) {
+                //srN+=1;
+                trData += "<option value='"+ obj.id+"'>"+obj.title+"</option>";
+            })
+            $("#lstpermissionName").html(trData);
+             $("#lstpermissionNameUpdate").html(trData);
+           
+            
+        }
+        });
+        //end permission title list 
+
+        //get permission url list
+        //$.ajax({
+        //url: '/api/Permissions/GetAllData',
+        //type: 'GET',
+        //dataType: "json",
+        // headers: {
+        //        "Authorization": "Bearer " + myToken
+        //    },
+        //success: function(data) {
+        //    var trData = "";
+        //    $.each(data, function(index, obj) {
+        //        //srN+=1;
+        //        trData += "<option value='"+ obj.id+"' readonly>"+obj.url+"</option>";
+        //    })
+        //    $("#lstpermissionUrl").html(trData);
+        //     $("#lstpermissionUrlUpdate").html(trData);
+           
+            
+        //}
+        //});
+        //end permission url list 
+
+        //get user Role
+         $.ajax({
+        url: '/api/UserRole/GetAllUser',
+        type: 'GET',
+        dataType: "json",
+         headers: {
+                "Authorization": "Bearer " + myToken
+            },
+        success: function(data) {
+            var trData = "";
+            $.each(data, function(index, obj) {
+                //srN+=1;
+                trData += "<option value='"+ obj.userId+"'>"+obj.userTitle+"</option>";
+            })
+            $("#lstuserRoleName").html(trData);
+           $("#lstuserRoleNameUpdate").html(trData);
+            
+        }
+    });
+    //end of user role
+
+
+    //GET ALL FACULTY DATA
+    function GetRoleAssignmentData() { 
+    $.ajax({
+        url: '/api/RoleAssignment/GetAllRole',
+        type: 'GET',
+        dataType: "json",
+        headers: {
+                "Authorization": "Bearer " + myToken
+            },     
+        success: function(data) {
+            var trData = "";
+            srN = 0;
+            //alert("Allowed api")
+            $.each(data, function(index, obj) {
+                srN+=1;
+                trData += "<tr><td class='tdSrNo'>"+srN+"</td><td id='permissionsId" +obj.assignmentId+"'>"+obj.idPermission+"</td><td id='permissionsName" +obj.assignmentId+"'>"+obj.title+"</td><td id='permissionsUrl" +obj.assignmentId+"'>"+obj.url+"</td><td id='usersId" +obj.assignmentId+"'>"+obj.idUser+"</td><td id='usersTitle" +obj.assignmentId+"'>"+obj.userTitle+"</td><td><button class='btn btn-warning btnEdit' id='btnEdit" +obj.assignmentId+"'>Edit</button><button class='btn btn-danger mx-2 btnDelete' id='btnDelete" +obj.assignmentId+"'>Delete</button></td></tr>";
+            })
+            $("#tblData").html(trData);
+        }
+    });
+    }
+    //END OF GET ALL FACULTY DATA
+
+
+     //post -------- Insert Data
+    $('#btnSubmit').click(function() {
+        var PermissionId = $("#lstpermissionName").val();
+       // var PermissionUrl = $("#lstpermissionUrl").val();
+        var UserRoleId = $('#lstuserRoleName').val();
+       
+       
+        var obj = {"idPermission":PermissionId,"idUser": UserRoleId};
+        $.ajax({
+            url: '/api/RoleAssignment/InsertUserRole',
+            type: "POST",
+            'contentType': 'application/json',
+            dataType: "json",
+            data: JSON.stringify(obj),
+            headers: {
+                "Authorization": "Bearer " + myToken
+            }, 
+            success: function(data) {
+                
+                if (data.result == "Inserted Successfully") {
+                    console.log(data)
+                    //alert(PermissionId + " " + UserRoleId+" "+data.result);
+                    GetRoleAssignmentData();
+
+                    $("#lstpermissionName").val('');
+                    $('#lstuserRoleName').val('');
+                }
+                else {
+                    alert(data.result);
+                }
+              
+            }
+        });
+    })
+
+//    //End of POST Request -------- Insert Data
+
+
+  //update
+    $('#tblUpdate').hide();
+
+    $('#btnCancel').click(function() {
+        $('#tblUpdate').hide();
+        $('#tblInsert').show();
+    })
+
+    $('#btnUpdate').click(function() {
+        var PermissionId = $("#lstpermissionNameUpdate").val();
+        //var PermissionUrl = $("#lstpermissionUrlUpdate").val();
+        var UserRole = $("#lstuserRoleNameUpdate").val();
+
+        var obj = {"idPermission":PermissionId,"idUser": UserRole,"assignmentId":updAssignmentId};
+       
+        $.ajax({
+            url: '/api/RoleAssignment/UpdateUserRole',
+            type: "PUT",
+            'contentType': 'application/json',
+            dataType: "json",
+             headers: {
+                "Authorization": "Bearer " + myToken
+            }, 
+            data: JSON.stringify(obj),
+            success: function(data) {
+                if (data.result == "Updated Successfully") {
+                    console.log(data);
+                    $('#tblInsert').show();
+                    $('#tblUpdate').hide();
+                    GetRoleAssignmentData();
+        
+                }
+                else {
+                    alert(data.result);
+                    
+                }
+            }
+        });
+    });
+    
+    $(document).on('click', '.btnEdit', function() {
+        
+        $('html, body').animate({
+                    scrollTop: $("#tblUpdate").offset().top
+               }, 800);
+
+        var assignmentId = $(this).attr('id');
+        assignmentId = assignmentId.replace('btnEdit', '');
+       // alert(assignmentId)
+        var permissionsId=$('#permissionsId' + assignmentId).html();
+        //alert(permissionsId)
+        var permissionsName = $('#permissionsName' + assignmentId).html();
+        //alert(permissionsName);
+       // var permissionsUrl = $('#permissionsUrl' + assignmentId).html();
+        //alert(permissionsUrl);
+        var usersId= $('#usersId' + assignmentId).html();
+        //alert(usersId);
+        var usersTitle= $('#usersTitle' + assignmentId).html();
+        //alert(usersTitle);
+
+        $('#tblUpdate').show();
+        $('#tblInsert').hide();
+        updAssignmentId = assignmentId;
+        $('#lstpermissionNameUpdate').val(permissionsId);
+        //$('#lstpermissionUrlUpdate').val(permissionsId);
+        $('#lstuserRoleNameUpdate').val(usersId);
+        //$('#txtfacUpdateName').val(usersId);
+        //$('#txtfacUpdateName').val(usersTitle);
+        
+    });
+//    //End of UpdateRequest
+
+
+// Delete Request
+       $(document).on('click', '.btnDelete', function() {
+        var assignmentId = $(this).attr('id');
+        assignmentId = assignmentId.replace('btnDelete', '');
+          
+         
+        if (confirm("You want to delete this"))
+        {
+           var obj = { 'assignmentId': assignmentId }
+            $.ajax({
+                url: '/api/RoleAssignment/DeleteUserRole',
+                type: "DELETE",
+                'contentType': 'application/json',
+                dataType: "json",
+                data: JSON.stringify(obj),
+                headers: {
+                "Authorization": "Bearer " + myToken
+            }, 
+                success: function(response) 
+                {
+                    if (response.result =="Deleted Successfully") 
+                    {
+                        $('#btnDelete' + response.objectData.facultyId).closest('tr').remove();
+                        $('.tdSrNo').each(function (index,obj) {
+                            $(this).html(index+1);
+                        });
+                        alert("Deleted Successfully!");
+                        GetRoleAssignmentData();
+                    }
+                    else 
+                    {
+                        alert(response.result);
+                    }
+                }
+            });
+        }
+    });
+
+
+//    // Delete Request
+
+})
+        
+
+       
+
+    </script>

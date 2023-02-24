@@ -1,0 +1,71 @@
+﻿body {
+    
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin: 2rem auto;
+    border: 1px solid #ddd;
+    font-size: 18px;
+    width:100%;
+}
+td:nth-child(2) {
+    width: 30%
+}
+td:nth-child(3){
+    width:40%;
+    text-align:justify;
+    font-size:18px;
+}
+th, td {
+    text-align: center;
+    padding: 16px;
+}
+#allData thead tr th {
+    text-align: center;
+    padding: 16px;
+    color: #000;
+}
+
+#allData thead tr th {
+    background-color: white;
+}
+
+#allData tr:nth-child(even) {
+    background-color: lightsteelblue;
+}
+
+#btnSubmit {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 15px;
+    background-color: mediumseagreen;
+}
+#btnUpdate {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 15px;
+    background-color: peru;
+}
+#btnUpdate:hover {
+        background-color:white;
+        border: 1px solid peru;
+        border-radius: 10px;
+ }
+#btnCancel {
+    border: 1px solid peru;
+    border-radius: 10px;
+    padding: 10px 15px;
+}
+#btnCancel:hover {
+    border: none;
+    border-radius: 10px;
+    background-color: sandybrown;
+}
+#upd-heading {
+    color: peru;
+}
+#insert-heading {
+    color: mediumseagreen;
+}

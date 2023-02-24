@@ -1,0 +1,282 @@
+﻿
+@{
+    ViewData["Title"] = "Permission";
+}
+@{
+    Layout = "~/Views/Shared/theme.cshtml";
+}
+
+<link rel="stylesheet" href="/css/Style.css">
+<!-- jQuery -->
+<script src="/theme/plugins/jquery/jquery.min.js"></script>
+
+
+ <button type="submit" id="main" class="btn btn-success float-right mx-3">Main</button>
+  
+  <button type="submit" id="userRole" class="btn btn-success float-right mx-3">UserRole</button>
+  <button type="submit" id="roleAssignment" class="btn btn-success float-right mx-3">Role Assignment</button>
+
+  <!-- update table-->
+   <table id="tblUpdate">
+        <tr>
+            <td id="upd-heading">Update Permission Data</td>
+        </tr>
+       <tr>
+        <td>
+            <label for="PermissionId">Id:</label>
+            <input name="txtPermissionId" readonly type="text" id="txtPermissionId">
+        </td>
+       </tr>
+       <tr>
+        <td>
+            <label for="PermissionTitle">Title:</label>
+            <input name="txtPermissionTitle"  type="text" id="txtPermissionTitle">
+        </td>
+       </tr>
+       <tr>
+        <td>
+            <label for="PermissionUrl">URL:</label>
+            <input name="txtPermissionUrl" type="text" id="txtPermissionUrl" >
+        </td>
+       </tr>
+       <tr>
+        <td>
+            <button  id="btnUpdate" name="btnUpdate">Update</button>
+            <button  id="btnCancel" name="btnCancel">Cancel</button>
+        </td>
+       </tr>
+    </table>
+    <!--ENd of update table-->
+
+<!--Insert Data-->
+ <table id="tblInsert">
+        <tr>
+            <td id="insert-heading">Insert Permission Data</td>
+        </tr>
+       <tr>
+        <td>
+            <label for="titleName">Title:</label>
+            <input name="txtTitleName" type="text" id="txtTitleName">
+        </td>
+       </tr>
+       <tr>
+        <td>
+            <label for="UrlName">URL:</label>
+            <input name="txtUrlName" type="text" id="txtUrlName">
+        </td>
+       </tr>
+       <tr>
+        <td>
+            <button  type="submit" id="btnSubmit">Insert</button>
+        </td>
+       </tr>
+    </table>
+<!-- insert data-->
+
+
+                               <!--All Data-->
+    <table id="allData">
+    <thead>
+        <tr>
+    <th>Id</th>
+    <th>Title</th>
+    <th>URL</th>
+    <th>Action</th>
+  </tr>
+    </thead>
+    <tbody id="tblData"></tbody>
+</table>
+
+
+<script>
+var srN = 0;
+    $(document).ready(function() {
+
+
+         $("#main").click(function() {
+            window.location.href = "/RegisterFront/CMS";
+        })
+         $("#roleAssignment").click(function() {
+            window.location.href = "/RegisterFront/RoleAssignment";
+        })
+        $("#userRole").click(function() {
+            window.location.href = "/RegisterFront/UserRole";
+        })
+        $('#txtTitleName').focus();
+    
+    //get
+    $.ajax({
+        url: '/api/Permissions/GetAllData',
+        type: 'GET',
+        dataType: "json",
+        headers: {
+                "Authorization": "Bearer " + myToken
+            },
+        success: function(data) {
+            var trData = "";
+            $.each(data, function(index, obj) {
+                srN+=1;
+                trData += "<tr><td class='tdSrNo'>" + srN + "</td><td id='permissionName"+ obj.id +"'>" + obj.title + "</td><td id='permissionUrl"+ obj.id +"'>" + obj.url + "</td><td> <button  class='btn  btn-danger btnDelete' id='btnDelete" + obj.id + "'>Delete</button> <button  class='btn  btn-warning btnEdit' id='btnEdit" + obj.id + "'>Edit</button> </td></tr>"
+                $('#tblData').html(trData);
+            })
+        }
+    });
+    // end of get request
+
+    //post
+    $('#btnSubmit').click(function() {
+        var titleName = $('#txtTitleName').val();
+        var urlName = $('#txtUrlName').val();
+        var obj = { "title": titleName , "url": urlName };
+        $.ajax({
+            url: '/api/Permissions/InsertPermission',
+            type: "POST",
+            'contentType': 'application/json',
+            dataType: "json",
+            data: JSON.stringify(obj),
+            headers: {
+                "Authorization": "Bearer " + myToken
+            },
+            success: function(data) {
+                
+                if (data.result == "Inserted Successfully") {
+                    //alert(myToken);
+                    srN += 1;
+
+                    $('#tblData').append("<tr><td class='tdSrNo'>" + srN + "</td><td id='permissionName"+ data.objectData.id +"'>" + data.objectData.title + "</td><td id='permissionUrl"+ data.objectData.id +"'>" + data.objectData.url + "</td><td> <button  class='btn  btn-danger btnDelete' id='btnDelete" + data.objectData.id + "'>Delete</button> <button  class='btn  btn-warning btnEdit' id='btnEdit" + data.objectData.id + "'>Edit</button> </td></tr>")
+                    $('.tdSrNo').each(function (index,obj) {
+                            $(this).html(index+1);
+                        });
+                    $('#txtTitleName').val('');
+                    $('#txtUrlName').val('');
+                    $('#txtTitleName').focus();
+        
+                }
+                else {
+                    alert(data.result);
+                }
+            }
+        });
+    })
+
+    //End of POST Request
+
+
+     //update
+    $('#tblUpdate').hide();
+
+    $('#btnCancel').click(function() {
+        $('#tblUpdate').hide();
+        $('#tblInsert').show();
+    })
+
+    $('#btnUpdate').click(function() {
+        var id = $('#txtPermissionId').val();
+        var name = $('#txtPermissionTitle').val();
+        var url = $("#txtPermissionUrl").val();
+        var obj = {'id':id,'title':name,'url':url}
+        
+        $.ajax({
+            url: '/api/Permissions/UpdatePermission',
+            type: "PUT",
+            'contentType': 'application/json',
+            dataType: "json",
+            headers: {
+                "Authorization": "Bearer " + myToken
+            },
+            data: JSON.stringify(obj),
+            success: function(data) {
+                
+                if (data.result == "Updated Successfully") {
+                    var id = $('#txtPermissionId').val();
+                    var PermissionName = $('#txtPermissionTitle').val();
+                    var PermissionUrl = $('#txtPermissionUrl').val();
+                    //alert(data.result);
+
+                    $('#permissionName' + id).html(PermissionName);
+                    $('#permissionUrl' + id).html(PermissionUrl);
+
+                    $('#txtPermissionId').val('');
+                    $('#txtPermissionTitle').focus();
+                    $('#txtPermissionTitle').val('');
+                    $('#txtTitleName').focus();
+        
+                }
+                else {
+                    alert(data.result);
+                }
+            }
+        });
+        
+        $('#tblInsert').show();
+        $('#tblUpdate').hide();
+        
+    });
+    
+    $(document).on('click', '.btnEdit', function() {
+        
+        $('html, body').animate({
+                    scrollTop: $("#tblUpdate").offset().top
+               }, 800);
+
+        var permissionsId = $(this).attr('id');
+        permissionsId = permissionsId.replace('btnEdit', '');
+        var permissionsName = $('#permissionName' + permissionsId).html();
+        var permissionsUrl = $('#permissionUrl' + permissionsId).html();
+
+        $('#tblUpdate').show();
+        $('#tblInsert').hide();
+
+        $('#txtPermissionId').val(permissionsId);
+        $('#txtPermissionTitle').val(permissionsName);
+        $('#txtPermissionUrl').val(permissionsUrl);
+        console.log(permissionsName);
+    });
+    //End of PUT Request
+
+
+    // Delete Request
+       $(document).on('click', '.btnDelete', function() {
+        var PermissionId = $(this).attr('id');
+        PermissionId = PermissionId.replace('btnDelete', '');
+         
+        if (confirm("You want to delete this"))
+        {
+           var obj = { 'id': PermissionId }
+            $.ajax({
+                url: '/api/Permissions/DeletePermission',
+                type: "DELETE",
+                headers: {
+                "Authorization": "Bearer " + myToken
+            },
+                'contentType': 'application/json',
+                dataType: "json",
+                data: JSON.stringify(obj),
+                success: function(response) 
+                {
+                    if (response.result =="Deleted Successfully") 
+                    {
+                        $('#btnDelete' + response.objectData.id).closest('tr').remove();
+                        $('.tdSrNo').each(function (index,obj) {
+                            $(this).html(index+1);
+                        });
+                        alert("Department Deleted Successfully");
+                    }
+                    else 
+                    {
+                        alert(response.result);
+                    }
+                }
+            });
+        }
+    });
+//End of delete request
+
+   //var myToken  =  getCookie("MyToken");
+//alert(myToken);
+
+    })
+     
+
+</script>
+
