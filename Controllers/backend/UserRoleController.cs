@@ -39,7 +39,7 @@ namespace form.Controllers.backend
 
             ResponseClass response = new ResponseClass();
 
-            UserRole userrole = formContext.userRoles.Where(row => row.UserTitle == userObject.UserTitle).FirstOrDefault();
+            UserRole userrole = formContext.userRoles.Where(row => row.UserTitle == userObject.UserTitle && row.status == true).FirstOrDefault();
             if(userrole == null)
                 {
                 UserRole user = new UserRole();
@@ -68,10 +68,10 @@ namespace form.Controllers.backend
 
             ResponseClass response = new ResponseClass();
 
-            UserRole userObj = formContext.userRoles.Where(row => row.UserId == updationObject.UserId).FirstOrDefault();
+            UserRole userObj = formContext.userRoles.Where(row => row.UserId == updationObject.UserId ).FirstOrDefault();
             if(userObj == null)
                 {
-                response.Result = "Invalid";
+                response.Result = "User Already Exist";
                 return response;
 
                 }

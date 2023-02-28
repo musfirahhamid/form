@@ -52,7 +52,7 @@ namespace form.Controllers.backend
 
             ResponseClass response = new ResponseClass();
 
-            Permissions permission = formContext.permissions.Where(row => row.URL == permissionObject.URL).FirstOrDefault();
+            Permissions permission = formContext.permissions.Where(row => row.URL == permissionObject.URL  && row.status == true).FirstOrDefault();
             if(permission == null)
                 {
                 Permissions permissionObj = new Permissions();

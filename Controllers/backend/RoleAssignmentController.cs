@@ -62,7 +62,7 @@ namespace form.Controllers.backend
 
             ResponseClass response = new ResponseClass();
 
-            RoleAssignment userrole = formContext.roleAssignments.Where(row => row.idUser == userObject.idUser && row.idPermission == userObject.idPermission).FirstOrDefault();
+            RoleAssignment userrole = formContext.roleAssignments.Where(row => row.idUser == userObject.idUser && row.idPermission == userObject.idPermission && row.status==true).FirstOrDefault();
             if(userrole == null)
                 {
                 RoleAssignment role = new RoleAssignment();
@@ -94,7 +94,7 @@ namespace form.Controllers.backend
             ResponseClass response = new ResponseClass();
 
 
-            RoleAssignment userrole = formContext.roleAssignments.Where(row => row.AssignmentId== userUpdateObject.AssignmentId).FirstOrDefault();
+            RoleAssignment userrole = formContext.roleAssignments.Where(row => row.AssignmentId== userUpdateObject.AssignmentId ).FirstOrDefault();
             if(userrole == null)
                 {
                 response.Result = "Not Found";

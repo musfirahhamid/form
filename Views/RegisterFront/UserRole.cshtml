@@ -236,11 +236,11 @@ var srN = 0;
                 {
                     if (response.result =="Deleted Successfully") 
                     {
-                        $('#btnDelete' + response.objectData.id).closest('tr').remove();
+                        $('#btnDelete' + response.objectData.userId).closest('tr').remove();
                         $('.tdSrNo').each(function (index,obj) {
                             $(this).html(index+1);
                         });
-                        alert("Department Deleted Successfully");
+                        alert("Deleted Successfully");
                     }
                     else 
                     {
